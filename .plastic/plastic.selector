@@ -1,0 +1,4 @@
+repository "Civic Sense Game/Civic Sense Game@13469268195565@cloud"
+  path "/"
+    br "/main"
+    co "/main"
