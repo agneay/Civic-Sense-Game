@@ -15552,9 +15552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f52d1e5345c395641b482217c8804ff9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.CameraSwitcher
-  m_Cameras:
-  - {fileID: 62046721}
-  - {fileID: 1372420048}
+  camera1: {fileID: 62046721}
+  camera2: {fileID: 1372420048}
 --- !u!1 &63989105
 GameObject:
   m_ObjectHideFlags: 0
