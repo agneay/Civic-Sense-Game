@@ -344737,6 +344737,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraSwitcher
   cam1: {fileID: 62046721}
   cam2: {fileID: 1372420048}
+--- !u!114 &1243051870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1243051860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd97d91a5f4aae489a619bdb2886c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  deathY: -10
 --- !u!1 &1243237507
 GameObject:
   m_ObjectHideFlags: 0
@@ -431434,6 +431447,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 107314, guid: 841e8e4f1a54c754396b7559d1cc6fad, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1243051868}
+    - targetCorrespondingSourceObject: {fileID: 107314, guid: 841e8e4f1a54c754396b7559d1cc6fad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1243051870}
   m_SourcePrefab: {fileID: 100100000, guid: 841e8e4f1a54c754396b7559d1cc6fad, type: 3}
 --- !u!4 &1553262202 stripped
 Transform:
