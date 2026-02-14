@@ -4,16 +4,24 @@ public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
+    public int maxHealth = 20;
 
     private Rigidbody rb;
     private bool isGrounded;
+    public HealthBarScript healthBarScript;
+    public int currentHealth;
 
     void Start()
     {
+        currentHealth = maxHealth;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // Prevents player from falling over
     }
-
+    void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        healthBarScript.setHealth(currentHealth);
+    }
     void Update()
     {
         MovePlayer();
