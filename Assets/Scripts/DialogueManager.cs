@@ -36,7 +36,7 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = sentence;
         Debug.Log(sentence);
     }
-    void EndDialogue()
+    public void EndDialogue()
     {
         Debug.Log("Conversation ended");
     }
