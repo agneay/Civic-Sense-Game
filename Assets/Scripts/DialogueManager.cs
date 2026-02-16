@@ -1,29 +1,43 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
+using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
-    public Text nameText;
-    public Text dialogueText;
+    [Header("UI")]
+    public GameObject dialogueSystem;   // Parent object
+    public TMP_Text nameText;
+    public TMP_Text dialogueText;
+
     private Queue<string> sentences;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         sentences = new Queue<string>();
+
+        // Ensure clean startup state
+        dialogueSystem.SetActive(false);
+        DisableCursor();
     }
+
     public void StartDialogue(Dialogue dialogue)
     {
+        dialogueSystem.SetActive(true);
+        EnableCursor();
+
         Debug.Log("Starting conversation with " + dialogue.name);
+
         nameText.text = dialogue.name;
         sentences.Clear();
+
         foreach (string sentence in dialogue.sentences)
         {
             sentences.Enqueue(sentence);
         }
+
         DisplayNextSentence();
     }
+
     public void DisplayNextSentence()
     {
         if (sentences.Count == 0)
@@ -32,12 +46,29 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        string sentence = sentences.Dequeue();
-        dialogueText.text = sentence;
-        Debug.Log(sentence);
+        dialogueText.text = sentences.Dequeue();
     }
+
     public void EndDialogue()
     {
         Debug.Log("Conversation ended");
+
+        dialogueSystem.SetActive(false);
+        DisableCursor();
+    }
+
+    // ============================
+    // Cursor Control
+    // ============================
+    void EnableCursor()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    void DisableCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }
