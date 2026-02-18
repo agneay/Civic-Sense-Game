@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Civic-Sense-Game.slnx"
+    "dotnet.defaultSolution": "game-jam.slnx"
 }
