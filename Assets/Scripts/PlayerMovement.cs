@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     public HealthBarScript healthBarScript;
     public int currentHealth;
+    public QuestBookBehaviour questBookBehaviour;
 
     void Start()
     {
@@ -29,6 +30,10 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            questBookBehaviour.OpenQuestBook();
         }
     }
 
