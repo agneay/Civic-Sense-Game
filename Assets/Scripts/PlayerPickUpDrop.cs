@@ -1,38 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerPickUpDrop : MonoBehaviour
 {
-    [SerializeField] private Transform playerCameraTransform;
-    [SerializeField] private LayerMask pickUpLayerMask;
-    [SerializeField] private Transform objectGrabPointTransform;
 
-    private ObjectGrabable objectGrabable;
+
+    [SerializeField] private Transform playerCameraTransform;
+    [SerializeField] private Transform objectGrabPointTransform;
+    [SerializeField] private LayerMask pickUpLayerMask;
+
+
+    private ObjectGrabbable objectGrabbable;
+
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            if (objectGrabable == null)
+            if (objectGrabbable == null)
             {
-                float pickUpDistance = 2f;
-
-                if (Physics.Raycast(
-                    playerCameraTransform.position,
-                    playerCameraTransform.forward,
-                    out RaycastHit raycastHit,
-                    pickUpDistance,
-                    pickUpLayerMask))
+                // Not carrying an object, try to grab
+                float pickUpDistance = 4f;
+                if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out RaycastHit raycastHit, pickUpDistance, pickUpLayerMask))
                 {
-                    if (raycastHit.transform.TryGetComponent(out objectGrabable))
+                    if (raycastHit.transform.TryGetComponent(out objectGrabbable))
                     {
-                        objectGrabable.Grab(objectGrabPointTransform);
+                        objectGrabbable.Grab(objectGrabPointTransform);
                     }
                 }
             }
             else
             {
-                objectGrabable.Drop();
-                objectGrabable = null;
+                // Currently carrying something, drop
+                objectGrabbable.Drop();
+                objectGrabbable = null;
             }
         }
     }

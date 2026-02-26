@@ -1,11 +1,17 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class CountdownTimer : MonoBehaviour
 {
-    public float timeRemaining = 600f; // 10 minutes = 600 seconds
+    public float timeRemaining = 600f; // 10 minutes
     public TextMeshProUGUI timerText;
+
+    [Header("Game Over")]
+    public string gameOverSceneName = "GameOver";
+
     private bool timerIsRunning = true;
+    private bool gameOverTriggered = false;
 
     void Update()
     {
@@ -14,12 +20,19 @@ public class CountdownTimer : MonoBehaviour
             timeRemaining -= Time.deltaTime;
             DisplayTime(timeRemaining);
         }
-        else if (timeRemaining <= 0)
+        else if (!gameOverTriggered)
         {
             timeRemaining = 0;
             timerIsRunning = false;
             DisplayTime(timeRemaining);
+            TriggerGameOver();
         }
+    }
+
+    void TriggerGameOver()
+    {
+        gameOverTriggered = true;
+        SceneManager.LoadScene(gameOverSceneName);
     }
 
     void DisplayTime(float timeToDisplay)
@@ -27,6 +40,6 @@ public class CountdownTimer : MonoBehaviour
         int minutes = Mathf.FloorToInt(timeToDisplay / 60);
         int seconds = Mathf.FloorToInt(timeToDisplay % 60);
 
-        timerText.text = string.Format("Time Remaining: {0:00}:{1:00}", minutes, seconds);
+        timerText.text = $"Time Remaining: {minutes:00}:{seconds:00}";
     }
 }

@@ -1,7 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectGrabable : MonoBehaviour
+public class ObjectGrabbable : MonoBehaviour
 {
+
+
     private Rigidbody objectRigidbody;
     private Transform objectGrabPointTransform;
 
@@ -14,14 +18,12 @@ public class ObjectGrabable : MonoBehaviour
     {
         this.objectGrabPointTransform = objectGrabPointTransform;
         objectRigidbody.useGravity = false;
-        objectRigidbody.isKinematic = true;
     }
 
     public void Drop()
     {
         this.objectGrabPointTransform = null;
         objectRigidbody.useGravity = true;
-        objectRigidbody.isKinematic = false;
     }
 
     private void FixedUpdate()
@@ -29,13 +31,10 @@ public class ObjectGrabable : MonoBehaviour
         if (objectGrabPointTransform != null)
         {
             float lerpSpeed = 10f;
-            Vector3 newPos = Vector3.Lerp(
-                objectRigidbody.position,
-                objectGrabPointTransform.position,
-                Time.fixedDeltaTime * lerpSpeed
-            );
-
-            objectRigidbody.MovePosition(newPos);
+            Vector3 newPosition = Vector3.Lerp(transform.position, objectGrabPointTransform.position, Time.deltaTime * lerpSpeed);
+            objectRigidbody.MovePosition(newPosition);
         }
     }
+
+
 }
