@@ -55,6 +55,7 @@ public class DialogueManager : MonoBehaviour
 
         dialogueSystem.SetActive(false);
         DisableCursor();
+        FindObjectOfType<NPCDialogueController>()?.OnDialogueFinished();
     }
 
     // ============================

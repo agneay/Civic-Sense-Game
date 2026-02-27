@@ -6,6 +6,7 @@ public class NPCDialogueController : MonoBehaviour
 {
     public NPCPersona persona;
     public DialogueManager dialogueManager;
+    public PlayerDialogueInput playerInputUI;
     public GeminiNPCService geminiService;
 
     private List<string> memory = new List<string>();
@@ -40,5 +41,9 @@ public class NPCDialogueController : MonoBehaviour
         memory.Add(line);
         if (memory.Count > MAX_MEMORY)
             memory.RemoveAt(0);
+    }
+    public void OnDialogueFinished()
+    {
+        playerInputUI.Activate(this);
     }
 }
