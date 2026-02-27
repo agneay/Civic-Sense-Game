@@ -17,11 +17,15 @@ public class PlayerMovement : MonoBehaviour
         currentHealth = maxHealth;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // Prevents player from falling over
+        ToastNotification.Show("Hey, Civic Guardian!");
+        ToastNotification.Show("Your time is ticking!");
+        ToastNotification.Show("Meet, the police officer to know more");
     }
     void TakeDamage(int damage)
     {
         currentHealth -= damage;
         healthBarScript.setHealth(currentHealth);
+        ToastNotification.Show("Oops! You took in some damage");
     }
     void Update()
     {
