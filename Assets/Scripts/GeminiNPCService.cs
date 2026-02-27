@@ -38,7 +38,9 @@ public class GeminiNPCService : MonoBehaviour
             Debug.LogError("Gemini API Error: " + request.error);
             return "…The NPC stays silent.";
         }
+
         Debug.Log("Gemini RAW RESPONSE:\n" + request.downloadHandler.text);
+
         return ExtractText(request.downloadHandler.text);
     }
 
@@ -48,6 +50,10 @@ public class GeminiNPCService : MonoBehaviour
                    .Replace("\"", "\\\"")
                    .Replace("\n", "\\n");
     }
+
+    // =========================
+    // JSON STRUCTURE (ONLY ONCE)
+    // =========================
 
     [System.Serializable]
     private class GeminiResponse
@@ -82,6 +88,8 @@ public class GeminiNPCService : MonoBehaviour
 
             if (response.candidates != null &&
                 response.candidates.Length > 0 &&
+                response.candidates[0].content != null &&
+                response.candidates[0].content.parts != null &&
                 response.candidates[0].content.parts.Length > 0)
             {
                 return response.candidates[0].content.parts[0].text;
