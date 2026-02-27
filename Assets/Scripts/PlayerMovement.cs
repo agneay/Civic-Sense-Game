@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
     public int maxHealth = 20;
+    [SerializeField] private GameObject targetObject;
 
     private Rigidbody rb;
     private Animator animator;
@@ -43,8 +44,18 @@ public class PlayerMovement : MonoBehaviour
         {
             questBookBehaviour.OpenQuestBook();
         }
-    }
 
+        if (Input.GetKeyDown(KeyCode.Slash) && Input.GetKey(KeyCode.LeftShift))
+        {
+            ToggleObject();
+        }
+    }
+    void ToggleObject()
+    {
+        if (targetObject == null) return;
+
+        targetObject.SetActive(!targetObject.activeSelf);
+    }
     void MovePlayer()
     {
         float x = Input.GetAxis("Horizontal");
