@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("CityScene");
+        SceneManager.LoadScene("getDetails");
     }
 
     public void QuitGame()

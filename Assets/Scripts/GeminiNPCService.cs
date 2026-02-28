@@ -5,15 +5,20 @@ using System.Threading.Tasks;
 
 public class GeminiNPCService : MonoBehaviour
 {
-    [Header("DEV ONLY – Do not ship API keys")]
-    [SerializeField] private string apiKey;
-
     private const string MODEL_URL =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
     public async Task<string> GetNPCResponse(string prompt)
     {
-        string url = MODEL_URL + apiKey;
+        // Safety check
+        if (APIKeyManager.Instance == null ||
+            string.IsNullOrEmpty(APIKeyManager.Instance.API_KEY))
+        {
+            Debug.LogError("API Key not set!");
+            return "API key missing.";
+        }
+
+        string url = MODEL_URL + APIKeyManager.Instance.API_KEY;
 
         string jsonBody =
 @"{
