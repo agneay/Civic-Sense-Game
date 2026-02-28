@@ -8,16 +8,22 @@ public class NPCInteraction : MonoBehaviour
 
     void Update()
     {
+        // Press E only if player is near AND no conversation is active
         if (playerNearby && Input.GetKeyDown(KeyCode.E))
         {
-            dialogueController.StartConversation();
+            if (!dialogueController.IsConversationActive())
+            {
+                dialogueController.StartConversation();
+            }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
+        {
             playerNearby = true;
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -26,7 +32,7 @@ public class NPCInteraction : MonoBehaviour
         {
             playerNearby = false;
 
-            // 🔥 FORCE END CONVERSATION
+            // End conversation when leaving NPC range
             dialogueController.ForceEndConversation();
         }
     }

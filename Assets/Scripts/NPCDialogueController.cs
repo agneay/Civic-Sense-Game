@@ -15,42 +15,52 @@ public class NPCDialogueController : MonoBehaviour
     private const int MAX_MEMORY = 6;
 
     private bool isProcessing = false;
+    private bool isTalking = false;   // ✅ Tracks conversation state
 
-    // ================================
-    // START CONVERSATION
-    // ================================
+    // =================================
+    // CHECK IF ACTIVE
+    // =================================
+    public bool IsConversationActive()
+    {
+        return isTalking;
+    }
 
+    // =================================
+    // START CONVERSATION (Greeting only once)
+    // =================================
     public async void StartConversation()
     {
         if (isProcessing) return;
+        if (isTalking) return;        // ✅ Prevent restart
         if (persona == null) return;
 
-        playerInputUI.Activate(this);
-        playerInputUI.SetInteractable(false);   // 🔒 Lock input while NPC speaks
-
+        isTalking = true;
         isProcessing = true;
 
+        playerInputUI.Activate(this);
+        playerInputUI.SetInteractable(false);
+
         string history = string.Join("\n", memory);
-        string introPrompt = PromptBuilder.Build(persona, "Hello.", history);
+        string introPrompt = PromptBuilder.Build(persona, "Start the conversation with a greeting.", history);
 
         string npcReply = await geminiService.GetNPCResponse(introPrompt);
 
         isProcessing = false;
 
-        HandleReply("Hello.", npcReply);
+        HandleReply("", npcReply);
     }
 
-    // ================================
+    // =================================
     // PLAYER TALKS
-    // ================================
-
+    // =================================
     public async void Talk(string playerInput)
     {
+        if (!isTalking) return;                 // ✅ Must be in conversation
         if (isProcessing) return;
         if (string.IsNullOrWhiteSpace(playerInput)) return;
 
-        playerInputUI.SetInteractable(false);   // 🔒 Lock while thinking
         isProcessing = true;
+        playerInputUI.SetInteractable(false);
 
         string history = string.Join("\n", memory);
         string prompt = PromptBuilder.Build(persona, playerInput, history);
@@ -62,10 +72,9 @@ public class NPCDialogueController : MonoBehaviour
         HandleReply(playerInput, npcReply);
     }
 
-    // ================================
-    // HANDLE REPLY CLEANLY
-    // ================================
-
+    // =================================
+    // HANDLE REPLY
+    // =================================
     private void HandleReply(string playerInput, string npcReply)
     {
         string tone = ExtractTone(npcReply);
@@ -73,21 +82,30 @@ public class NPCDialogueController : MonoBehaviour
 
         ApplyEmotionalDamage(tone);
 
-        SaveToMemory("Player: " + playerInput);
+        if (!string.IsNullOrEmpty(playerInput))
+            SaveToMemory("Player: " + playerInput);
+
         SaveToMemory($"{persona.npcName}: {npcReply}");
 
         dialogueManager.ShowDialogue(persona.npcName, npcReply);
 
-        playerInputUI.SetInteractable(true);    // ✅ Re-enable input AFTER reply
+        playerInputUI.SetInteractable(true);
     }
 
+    // =================================
+    // MEMORY
+    // =================================
     private void SaveToMemory(string line)
     {
         memory.Add(line);
+
         if (memory.Count > MAX_MEMORY)
             memory.RemoveAt(0);
     }
 
+    // =================================
+    // TONE SYSTEM
+    // =================================
     private string ExtractTone(string text)
     {
         if (text.Contains("[TONE: Aggressive]")) return "Aggressive";
@@ -100,6 +118,7 @@ public class NPCDialogueController : MonoBehaviour
         int index = text.IndexOf("[TONE:");
         if (index >= 0)
             return text.Substring(0, index).Trim();
+
         return text;
     }
 
@@ -113,8 +132,19 @@ public class NPCDialogueController : MonoBehaviour
         if (damage > 0)
             playerMovement.TakeDamage(damage);
     }
+
+    // =================================
+    // FORCE END CONVERSATION
+    // =================================
     public void ForceEndConversation()
     {
+        if (!isTalking) return;
+
+        isTalking = false;
+        isProcessing = false;
+
+        memory.Clear();   // Optional: reset memory per conversation
+
         if (playerInputUI != null)
             playerInputUI.EndConversation();
 
