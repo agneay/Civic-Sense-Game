@@ -8,7 +8,7 @@ public class PlayerDialogueInput : MonoBehaviour
     public GameObject sendButton;
 
     [Header("Player Control")]
-    public PlayerMovement playerMovement;   // Drag your Player here
+    public PlayerMovement playerMovement;
 
     private NPCDialogueController currentNPC;
     private bool isActive = false;
@@ -18,17 +18,12 @@ public class PlayerDialogueInput : MonoBehaviour
         if (!isActive) return;
 
         if (Input.GetKeyDown(KeyCode.Return))
-        {
             SendMessageToNPC();
-        }
 
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             EndConversation();
-        }
     }
 
-    // Called by NPCDialogueController when dialogue finishes
     public void Activate(NPCDialogueController npc)
     {
         currentNPC = npc;
@@ -37,14 +32,12 @@ public class PlayerDialogueInput : MonoBehaviour
         inputField.text = "";
         inputField.gameObject.SetActive(true);
         sendButton.SetActive(true);
-
         inputField.ActivateInputField();
 
         // 🔒 Disable movement
         if (playerMovement != null)
             playerMovement.enabled = false;
 
-        // 🔓 Unlock cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -54,7 +47,6 @@ public class PlayerDialogueInput : MonoBehaviour
         if (string.IsNullOrWhiteSpace(inputField.text)) return;
 
         string msg = inputField.text.Trim();
-
         currentNPC.Talk(msg);
 
         inputField.text = "";
@@ -63,6 +55,8 @@ public class PlayerDialogueInput : MonoBehaviour
 
     public void EndConversation()
     {
+        Debug.Log("Conversation Ending — Unlocking movement");
+
         isActive = false;
 
         inputField.gameObject.SetActive(false);
@@ -74,7 +68,6 @@ public class PlayerDialogueInput : MonoBehaviour
         if (playerMovement != null)
             playerMovement.enabled = true;
 
-        // 🔒 Lock cursor again (for FPS style games)
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

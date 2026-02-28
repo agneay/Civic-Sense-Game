@@ -108,10 +108,21 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = false;
     }
 
-    void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        healthBarScript.setHealth(currentHealth);
-        ToastNotification.Show("Oops! You took in some damage");
+
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        if (healthBarScript != null)
+            healthBarScript.setHealth(currentHealth);
+
+        ToastNotification.Show("Your emotions were hurt! (-" + damage + " HP)");
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Player emotionally overwhelmed.");
+            // You can trigger game over here
+        }
     }
 }

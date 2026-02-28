@@ -22,6 +22,12 @@ Conversation so far:
 
 Player: {playerInput}
 
-Respond as the NPC in under 3 sentences. Stay in character.";
+Respond as the NPC in under 3 sentences. Stay in character.
+After your reply, add a tag:
+[TONE: Calm]
+or
+[TONE: Neutral]
+or
+[TONE: Aggressive]";
     }
 }

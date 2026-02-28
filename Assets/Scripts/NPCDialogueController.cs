@@ -23,6 +23,9 @@ public class NPCDialogueController : MonoBehaviour
         string prompt = PromptBuilder.Build(persona, playerInput, history);
 
         string npcReply = await geminiService.GetNPCResponse(prompt);
+        string tone = ExtractTone(npcReply);
+        npcReply = RemoveToneTag(npcReply);
+        ApplyEmotionalDamage(tone);
 
         SaveToMemory("Player: " + playerInput);
         SaveToMemory($"{persona.npcName}: {npcReply}");
@@ -45,5 +48,51 @@ public class NPCDialogueController : MonoBehaviour
     public void OnDialogueFinished()
     {
         playerInputUI.Activate(this);
+    }
+    private string ExtractTone(string text)
+    {
+        if (text.Contains("[TONE: Aggressive]"))
+            return "Aggressive";
+        if (text.Contains("[TONE: Neutral]"))
+            return "Neutral";
+        if (text.Contains("[TONE: Calm]"))
+            return "Calm";
+
+        return "Neutral";
+    }
+
+    private string RemoveToneTag(string text)
+    {
+        int index = text.IndexOf("[TONE:");
+        if (index >= 0)
+            return text.Substring(0, index).Trim();
+
+        return text;
+    }
+    public PlayerMovement playerMovement; // assign in inspector
+
+    private void ApplyEmotionalDamage(string tone)
+    {
+        if (playerMovement == null) return;
+
+        int damage = 0;
+
+        switch (tone)
+        {
+            case "Aggressive":
+                damage = 10;
+                break;
+
+            case "Neutral":
+                damage = 3;
+                break;
+
+            case "Calm":
+                damage = 0;
+                break;
+        }
+
+        if (damage > 0)
+            playerMovement.TakeDamage(damage);
     }
 }
