@@ -26,6 +26,8 @@ public class PlayerDialogueInput : MonoBehaviour
 
     public void Activate(NPCDialogueController npc)
     {
+        if (isActive) return;
+
         currentNPC = npc;
         isActive = true;
 
@@ -34,9 +36,9 @@ public class PlayerDialogueInput : MonoBehaviour
         sendButton.SetActive(true);
         inputField.ActivateInputField();
 
-        // 🔒 Disable movement
+        // 🔒 LOCK PLAYER CONTROL
         if (playerMovement != null)
-            playerMovement.enabled = false;
+            playerMovement.canControl = false;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -44,6 +46,7 @@ public class PlayerDialogueInput : MonoBehaviour
 
     public void SendMessageToNPC()
     {
+        if (currentNPC == null) return;
         if (string.IsNullOrWhiteSpace(inputField.text)) return;
 
         string msg = inputField.text.Trim();
@@ -55,7 +58,7 @@ public class PlayerDialogueInput : MonoBehaviour
 
     public void EndConversation()
     {
-        Debug.Log("Conversation Ending — Unlocking movement");
+        if (!isActive) return;
 
         isActive = false;
 
@@ -64,11 +67,16 @@ public class PlayerDialogueInput : MonoBehaviour
 
         currentNPC = null;
 
-        // 🔓 Re-enable movement
+        // 🔓 UNLOCK PLAYER CONTROL
         if (playerMovement != null)
-            playerMovement.enabled = true;
+            playerMovement.canControl = true;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+    public void SetInteractable(bool state)
+    {
+        inputField.interactable = state;
+        sendButton.SetActive(state);
     }
 }

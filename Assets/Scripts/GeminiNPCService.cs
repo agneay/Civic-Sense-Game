@@ -26,22 +26,26 @@ public class GeminiNPCService : MonoBehaviour
   ]
 }";
 
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        await request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
-            Debug.LogError("Gemini API Error: " + request.error);
-            return "…The NPC stays silent.";
+            request.uploadHandler =
+                new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            var operation = request.SendWebRequest();
+
+            while (!operation.isDone)
+                await Task.Yield();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Gemini API Error: " + request.error);
+                return "…The NPC stays silent.";
+            }
+
+            return ExtractText(request.downloadHandler.text);
         }
-
-        Debug.Log("Gemini RAW RESPONSE:\n" + request.downloadHandler.text);
-
-        return ExtractText(request.downloadHandler.text);
     }
 
     private string EscapeJson(string text)
@@ -52,7 +56,7 @@ public class GeminiNPCService : MonoBehaviour
     }
 
     // =========================
-    // JSON STRUCTURE (ONLY ONCE)
+    // JSON STRUCTURE
     // =========================
 
     [System.Serializable]
@@ -86,10 +90,9 @@ public class GeminiNPCService : MonoBehaviour
             GeminiResponse response =
                 JsonUtility.FromJson<GeminiResponse>(json);
 
-            if (response.candidates != null &&
+            if (response?.candidates != null &&
                 response.candidates.Length > 0 &&
-                response.candidates[0].content != null &&
-                response.candidates[0].content.parts != null &&
+                response.candidates[0]?.content?.parts != null &&
                 response.candidates[0].content.parts.Length > 0)
             {
                 return response.candidates[0].content.parts[0].text;

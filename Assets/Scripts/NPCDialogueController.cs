@@ -4,39 +4,81 @@ using System.Threading.Tasks;
 
 public class NPCDialogueController : MonoBehaviour
 {
+    [Header("References")]
     public NPCPersona persona;
     public DialogueManager dialogueManager;
     public PlayerDialogueInput playerInputUI;
     public GeminiNPCService geminiService;
+    public PlayerMovement playerMovement;
 
     private List<string> memory = new List<string>();
     private const int MAX_MEMORY = 6;
 
-    public void Talk(string playerInput)
+    private bool isProcessing = false;
+
+    // ================================
+    // START CONVERSATION
+    // ================================
+
+    public async void StartConversation()
     {
-        _ = HandleConversation(playerInput);
+        if (isProcessing) return;
+        if (persona == null) return;
+
+        playerInputUI.Activate(this);
+        playerInputUI.SetInteractable(false);   // 🔒 Lock input while NPC speaks
+
+        isProcessing = true;
+
+        string history = string.Join("\n", memory);
+        string introPrompt = PromptBuilder.Build(persona, "Hello.", history);
+
+        string npcReply = await geminiService.GetNPCResponse(introPrompt);
+
+        isProcessing = false;
+
+        HandleReply("Hello.", npcReply);
     }
 
-    private async Task HandleConversation(string playerInput)
+    // ================================
+    // PLAYER TALKS
+    // ================================
+
+    public async void Talk(string playerInput)
     {
+        if (isProcessing) return;
+        if (string.IsNullOrWhiteSpace(playerInput)) return;
+
+        playerInputUI.SetInteractable(false);   // 🔒 Lock while thinking
+        isProcessing = true;
+
         string history = string.Join("\n", memory);
         string prompt = PromptBuilder.Build(persona, playerInput, history);
 
         string npcReply = await geminiService.GetNPCResponse(prompt);
+
+        isProcessing = false;
+
+        HandleReply(playerInput, npcReply);
+    }
+
+    // ================================
+    // HANDLE REPLY CLEANLY
+    // ================================
+
+    private void HandleReply(string playerInput, string npcReply)
+    {
         string tone = ExtractTone(npcReply);
         npcReply = RemoveToneTag(npcReply);
+
         ApplyEmotionalDamage(tone);
 
         SaveToMemory("Player: " + playerInput);
         SaveToMemory($"{persona.npcName}: {npcReply}");
 
-        Dialogue aiDialogue = new Dialogue
-        {
-            name = persona.npcName,
-            sentences = new string[] { npcReply }
-        };
+        dialogueManager.ShowDialogue(persona.npcName, npcReply);
 
-        dialogueManager.StartDialogue(aiDialogue);
+        playerInputUI.SetInteractable(true);    // ✅ Re-enable input AFTER reply
     }
 
     private void SaveToMemory(string line)
@@ -45,19 +87,11 @@ public class NPCDialogueController : MonoBehaviour
         if (memory.Count > MAX_MEMORY)
             memory.RemoveAt(0);
     }
-    public void OnDialogueFinished()
-    {
-        playerInputUI.Activate(this);
-    }
+
     private string ExtractTone(string text)
     {
-        if (text.Contains("[TONE: Aggressive]"))
-            return "Aggressive";
-        if (text.Contains("[TONE: Neutral]"))
-            return "Neutral";
-        if (text.Contains("[TONE: Calm]"))
-            return "Calm";
-
+        if (text.Contains("[TONE: Aggressive]")) return "Aggressive";
+        if (text.Contains("[TONE: Calm]")) return "Calm";
         return "Neutral";
     }
 
@@ -66,33 +100,25 @@ public class NPCDialogueController : MonoBehaviour
         int index = text.IndexOf("[TONE:");
         if (index >= 0)
             return text.Substring(0, index).Trim();
-
         return text;
     }
-    public PlayerMovement playerMovement; // assign in inspector
 
     private void ApplyEmotionalDamage(string tone)
     {
         if (playerMovement == null) return;
 
-        int damage = 0;
-
-        switch (tone)
-        {
-            case "Aggressive":
-                damage = 10;
-                break;
-
-            case "Neutral":
-                damage = 3;
-                break;
-
-            case "Calm":
-                damage = 0;
-                break;
-        }
+        int damage = tone == "Aggressive" ? 10 :
+                     tone == "Neutral" ? 3 : 0;
 
         if (damage > 0)
             playerMovement.TakeDamage(damage);
+    }
+    public void ForceEndConversation()
+    {
+        if (playerInputUI != null)
+            playerInputUI.EndConversation();
+
+        if (dialogueManager != null)
+            dialogueManager.HideDialogue();
     }
 }

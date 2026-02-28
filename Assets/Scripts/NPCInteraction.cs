@@ -4,24 +4,20 @@ public class NPCInteraction : MonoBehaviour
 {
     public NPCDialogueController dialogueController;
 
-    private bool playerNearby;
+    private bool playerNearby = false;
 
     void Update()
     {
         if (playerNearby && Input.GetKeyDown(KeyCode.E))
         {
-            dialogueController.Talk(
-                "Why are you behaving like this? Do you know the rules?"
-            );
+            dialogueController.StartConversation();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
-        {
             playerNearby = true;
-        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -29,6 +25,9 @@ public class NPCInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerNearby = false;
+
+            // 🔥 FORCE END CONVERSATION
+            dialogueController.ForceEndConversation();
         }
     }
 }

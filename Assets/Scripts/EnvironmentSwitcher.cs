@@ -3,8 +3,11 @@ using UnityEngine.SceneManagement;
 
 public class EnvironmentSwitcher : MonoBehaviour
 {
-    // ONLY environment scenes here
+    [Header("Environment Scenes")]
     public string[] environmentScenes;
+
+    [Header("Player Reference")]
+    public PlayerMovement playerMovement;
 
     private int currentEnvIndex = 0;
 
@@ -24,8 +27,14 @@ public class EnvironmentSwitcher : MonoBehaviour
 
     void Update()
     {
+        // 🚫 Do nothing if dialogue (or any lock) is active
+        if (playerMovement != null && !playerMovement.canControl)
+            return;
+
         if (Input.GetKeyDown(KeyCode.T))
         {
+            if (environmentScenes.Length == 0) return;
+
             currentEnvIndex = (currentEnvIndex + 1) % environmentScenes.Length;
             SceneManager.LoadScene(environmentScenes[currentEnvIndex]);
         }
